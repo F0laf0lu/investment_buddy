@@ -56,3 +56,27 @@ $ pip install -r requirements.txt
 $ python manage.py runserver
 ```
 
+## Makefile shortcuts
+We've added a Makefile to simplify common development tasks. Make sure you're in the project root where the Makefile is
+located. Ensure you have the correct database credentials configured in your `.env` file, and reflect that in the 
+`db_init.sql`.
+
+### Set up the environment
+```
+make setup
+```
+
+### Set up the database
+```
+make resetdb
+```
+
+### Applying database migrations
+```
+make migrate
+```
+
+### Run django Development server
+```
+make runserver
+```

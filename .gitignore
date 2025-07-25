@@ -1,4 +1,5 @@
 .*
 venv
 core/__pycache__/
+core/migrations/__pycache__/
 config/__pycache__/
