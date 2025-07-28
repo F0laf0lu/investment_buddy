@@ -1,5 +1,5 @@
 from django.db import models
-from base_model import BaseModel
+from .base_model import BaseModel
 
 class InvestmentProduct(BaseModel):
     name = models.CharField(max_length=200)
