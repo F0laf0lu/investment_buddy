@@ -80,3 +80,6 @@ make migrate
 ```
 make runserver
 ```
+
+## Contributing
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
