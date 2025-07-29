@@ -3,5 +3,5 @@ from ..views.investment_product import InvestmentProductListView, InvestmentProd
 
 urlpatterns = [
     path('products', InvestmentProductListView.as_view(), name='investment-product-list'),
-    path('product/<id>', InvestmentProductDetailView.as_view(), name='investment-product-details'),
+    path('product/<uuid:id>', InvestmentProductDetailView.as_view(), name='investment-product-details'),
 ]
