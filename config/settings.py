@@ -28,6 +28,8 @@ DJANGO_APPS = [
 
 LOCAL_APPS = [
     'core',
+    'rest_framework',
+    'django_filters'
 ]
 
 THIRD_PARTY_APPS = [

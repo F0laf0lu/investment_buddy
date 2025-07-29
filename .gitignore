@@ -7,9 +7,13 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 media
-
 .env
 venv
 core/__pycache__/
 core/migrations/__pycache__/
+core/models/__pycache__/
+core/serializers/__pycache__/
+core/urls/__pycache__/
+core/views/__pycache__/
+config/__pycache__/
 config/__pycache__/

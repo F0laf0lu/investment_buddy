@@ -14,3 +14,6 @@ runserver:
 
 resetdb:
 	mysql -u root -p < db_init.sql
+
+inv_prd_dump:
+	mysql -u root -p < investment_product_dump.sql

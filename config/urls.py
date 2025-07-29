@@ -32,4 +32,5 @@ urlpatterns = [
 
     # project urls
     path('api/auth/', include('core.urls.auth')),
+    path('api/investmentbuddy/', include('core.urls.__init__')),
 ]
