@@ -31,5 +31,5 @@ urlpatterns = [
     path("ajazzinauth23qwe/", admin.site.urls),
 
     # project urls
-    path('api/auth', include('core.urls.auth')),
+    path('api/auth/', include('core.urls.auth')),
 ]
