@@ -2,14 +2,14 @@ from rest_framework import generics, filters, status, permissions
 from ..utils.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from ..models.investment_product import InvestmentProduct
-from ..serializers.investment_product_serializer import InvestmentProductSerializer
+from ..serializers.investment_product_serializer import InvestmentProductSerializer, InvestmentProductDetailSerializer
 
 class InvestmentProductListView(generics.ListAPIView):
     serializer_class = InvestmentProductSerializer
     permission_classes = [permissions.AllowAny]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['category', 'type']
-    search_fields = ['name', 'description']
+    filterset_fields = ['asset_type', 'risk_level']
+    search_fields = ['name', 'description', 'asset_type']
 
     def get_queryset(self):
         return InvestmentProduct.objects.all()
@@ -20,14 +20,14 @@ class InvestmentProductListView(generics.ListAPIView):
         return Response(
             success=True,
             status_code=status.HTTP_200_OK,
-            message='Profiles found',
+            message='Investments found',
             data=serializer.data
         )
 
 
 class InvestmentProductDetailView(generics.RetrieveAPIView):
     queryset = InvestmentProduct.objects.all()
-    serializer_class = InvestmentProductSerializer
+    serializer_class = InvestmentProductDetailSerializer
     permission_classes = [permissions.AllowAny]
     lookup_field = 'id'
 
@@ -37,6 +37,6 @@ class InvestmentProductDetailView(generics.RetrieveAPIView):
         return Response(
             success=True,
             status_code=status.HTTP_200_OK,
-            message='Profile retrieved successfully',
+            message='Investment retrieved successfully',
             data=serializer.data
         )

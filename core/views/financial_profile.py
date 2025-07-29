@@ -1,18 +1,23 @@
 from rest_framework import generics, permissions, status
 from ..utils.response import Response
 from ..models.financial_profile import FinancialProfile
-from ..serializers.financial_profile import FinancialProfileSerializer
+from ..serializers.financial_profile_serializer import FinancialProfileSerializer
 
 
 class FinancialProfileCreateView(generics.CreateAPIView):
     serializer_class = FinancialProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def get_object(self):
-        profile = FinancialProfile.objects.get(user=self.request.user)
-        return profile
-
     def post(self, request, *args, **kwargs):
+        user = request.user
+        if FinancialProfile.objects.filter(user=user).exists():
+            return Response(
+                success=False,
+                status_code=status.HTTP_400_BAD_REQUEST,
+                errors={'details': 'Financial profile already exists for the user'},
+                message='Unsuccessful profile creation'
+            )
+
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -68,17 +73,9 @@ class FinancialProfileDetailView(generics.RetrieveAPIView):
         profile = self.get_object()
         serializer = self.get_serializer(profile)
 
-        if serializer.is_valid():
-            return Response(
-                success=True,
-                status_code=status.HTTP_200_OK,
-                message='Profile found',
-                data=serializer.data
-            )
-
         return Response(
-            success=False,
-            status_code=status.HTTP_404_NOT_FOUND,
-            message='Profile not found',
-            errors=serializer.errors
+            success=True,
+            status_code=status.HTTP_200_OK,
+            message='Profile found',
+            data=serializer.data
         )

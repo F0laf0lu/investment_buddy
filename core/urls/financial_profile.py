@@ -4,6 +4,6 @@ from ..views.financial_profile import FinancialProfileCreateView, FinancialProfi
 
 urlpatterns = [
     path('profile/', FinancialProfileDetailView.as_view(), name='financial_profile_detail'),
-    path('profile/me/', FinancialProfileCreateView.as_view(), name='financial_profile_create'),
+    path('profile/create/', FinancialProfileCreateView.as_view(), name='financial_profile_create'),
     path('profile/update/', FinancialProfileUpdateView.as_view(), name='financial_profile_update')
 ]
