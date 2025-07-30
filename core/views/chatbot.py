@@ -1,6 +1,4 @@
 from rest_framework import generics, status, permissions
-from yaml import serialize
-
 from ..models.investment_product import InvestmentProduct
 from ..serializers.investment_product_serializer import InvestmentProductSerializer
 from ..utils.chatbot_response import InvestmentChatBot
