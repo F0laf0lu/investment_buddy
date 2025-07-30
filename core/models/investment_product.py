@@ -5,9 +5,9 @@ from .base_model import BaseModel
 class InvestmentProduct(BaseModel):
 
     RISK_LEVEL_CHOICES = [
-        ('LOW', 'LOW'), 
+        ('LOW', 'LOW'),
         ('MEDIUM', 'MEDIUM'),
-        ('HIGH', 'HIGH'),       
+        ('HIGH', 'HIGH'),
     ]
 
     ASSET_TYPES = [
