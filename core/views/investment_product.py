@@ -1,4 +1,7 @@
 from rest_framework import generics, filters, status, permissions
+from rest_framework.utils.representation import serializer_repr
+
+from ..models.financial_profile import FinancialProfile
 from ..utils.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from ..models.investment_product import InvestmentProduct
@@ -38,5 +41,45 @@ class InvestmentProductDetailView(generics.RetrieveAPIView):
             success=True,
             status_code=status.HTTP_200_OK,
             message='Investment retrieved successfully',
+            data=serializer.data
+        )
+
+class TailoredInvestmentProductListView(generics.ListAPIView):
+    serializer_class = InvestmentProductSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        try:
+            profile = FinancialProfile.objects.get(user_id=user.id)
+        except FinancialProfile.DoesNotExist:
+            return InvestmentProduct.objects.none()
+
+        queryset = InvestmentProduct.objects.all()
+
+        if profile.risk_appetite:
+            queryset = queryset.filter(risk_level__iexact=profile.risk_appetite.upper())
+
+        if profile.investment_budget:
+            queryset = queryset.filter(min_investment__lte=profile.investment_budget)
+
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+
+        if not queryset.exists():
+            return Response(
+                status_code=status.HTTP_404_NOT_FOUND,
+                success=False,
+                message='No investment products match your financial profile',
+                data=[]
+            )
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(
+            status_code=status.HTTP_200_OK,
+            success=True,
+            message='Investment Listing successfully tailored',
             data=serializer.data
         )
