@@ -11,6 +11,7 @@ class InvestmentPortfolio(BaseModel):
         ('redeemed', 'REDEEMED'),
         ('matured', 'MATURED'),
     ]
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='portfolios')
     product = models.ForeignKey(InvestmentProduct, on_delete=models.CASCADE, related_name='portfolios')
     units_purchased = models.PositiveIntegerField()

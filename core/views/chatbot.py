@@ -24,10 +24,8 @@ class ChatBotView(generics.GenericAPIView):
         response_data = chatbot.get_response(user_message)
         filters = response_data.get("filters", {})
 
-        if filters:
-            queryset = InvestmentProduct.objects.filter(**filters)
-        else:
-            queryset = InvestmentProduct.objects.none()
+
+        queryset = InvestmentProduct.objects.filter(**filters)
 
         serializer = self.get_serializer(queryset, many=True)
 
