@@ -1,5 +1,4 @@
 from rest_framework import generics, status, permissions
-from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from django.utils.html import escape
 from ..models.financial_profile import FinancialProfile
 from ..models.investment_product import InvestmentProduct
@@ -90,10 +89,8 @@ class ChatbotPromptView(generics.GenericAPIView):
 
 class ChatbotRespondView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def post(self, request, *args, **kwargs):
-        user = request.user
         message = request.data.get("message", "").lower().strip()
 
         # Get risk level and response from the flat maps
