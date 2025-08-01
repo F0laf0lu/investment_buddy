@@ -33,7 +33,7 @@ class DashboardView(generics.GenericAPIView):
         # Transactions
         transactions = Transaction.objects.filter(user=user).order_by('created_at')[:5]
         total_transactions = Transaction.objects.filter(user=user).count()
-        transaction_data = TransactionSerializer(transactions).data
+        transaction_data = TransactionSerializer(transactions, many=True).data
 
         # Financial Profile
         profile = FinancialProfile.objects.filter(user=user).first()
@@ -47,7 +47,11 @@ class DashboardView(generics.GenericAPIView):
             status_code=status.HTTP_200_OK,
             message='Dashboard data retrieved successfully',
             data={
-                "user_profile": user,
+                "user_profile": {
+                    "id": str(user.id),
+                    "email": user.email,
+                    "full_name": user.full_name
+                },
                 "wallet": wallet_data,
                 "portfolio": portfolio_data,
                 "transactions": {

@@ -20,17 +20,17 @@ class InvestmentChatBot:
                 "filters": {"asset_type": "NAIRA_BONDS"}
             },
             {
-                "keywords": ["low risk", "safe", "conservative"],
+                "keywords": ["low risk", "safe", "conservative", "low-risk"],
                 "response": "Here are some low-risk investment options available.",
                 "filters": {"risk_level": "LOW"}
             },
             {
-                "keywords": ["medium risk", "moderate"],
+                "keywords": ["medium risk", "moderate", "medium-risk"],
                 "response": "These options offer moderate returns with moderate risk.",
                 "filters": {"risk_level": "MEDIUM"}
             },
             {
-                "keywords": ["high risk", "aggressive"],
+                "keywords": ["high risk", "aggressive", "high-risk"],
                 "response": "These are high-risk investment with potentially high returns.",
                 "filters": {"risk_level": "HIGH"}
             },
@@ -44,8 +44,9 @@ class InvestmentChatBot:
                 if keyword in user_input_l:
                     return {
                         "message": guide["response"],
-                        "filter": guide.get("filters", {})
+                        "filters": guide.get("filters", {})
                     }
+
         return {
             "message": (
                 "I am sorry, I didn't catch that. "

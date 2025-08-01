@@ -7,4 +7,5 @@ urlpatterns = [
     path('', include('core.urls.transaction')),
     path('', include('core.urls.investment_portfolio')),
     path('', include('core.urls.wallet')),
+    path('', include('core.urls.dashboard'))
 ]
