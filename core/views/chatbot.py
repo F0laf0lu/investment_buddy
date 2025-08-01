@@ -29,13 +29,35 @@ class ChatBotView(generics.GenericAPIView):
 
         queryset = InvestmentProduct.objects.filter(**filters)
 
-        serializer = self.get_serializer(queryset, many=True)
+        if not queryset.exists():
+            return Response(
+                success=True,
+                status_code=status.HTTP_200_OK,
+                message="No matching investments found.",
+                data="<p>Sorry, we couldn't find any matching investment products at this time.</p>"
+            )
+
+        html_content = [f"<h2>{escape(response_data.get('message', 'Here are some investment suggestions:'))}</h2><ul>"]
+
+        for product in queryset:
+            html_content.append(f"""
+                <li style="margin-bottom: 1rem;">
+                    <h3>{escape(product.name)}</h3>
+                    <p><strong>Description:</strong> {escape(product.description)}</p>
+                    <p><strong>Asset Type:</strong> {escape(product.asset_type.replace('_', ' ').title())}</p>
+                    <p><strong>Risk Level:</strong> {escape(product.risk_level.title())}</p>
+                    <p><strong>Yield:</strong> {product.indicative_yield}% &nbsp;&nbsp; <strong>Offer Price:</strong> ₦{product.offer_price:,.2f}</p>
+                    <a href="{escape(product.prospectus_url)}" target="_blank">View Prospectus</a>
+                </li>
+            """)
+
+        html_content.append("</ul>")
 
         return Response(
             success=True,
             status_code=status.HTTP_200_OK,
             message=response_data.get("message"),
-            data=serializer.data
+            data="".join(html_content)
         )
 
 class ChatbotPromptView(generics.GenericAPIView):
