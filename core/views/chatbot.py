@@ -27,6 +27,7 @@ class ChatBotView(generics.GenericAPIView):
         filters = response_data.get("filters", {})
 
         queryset = InvestmentProduct.objects.filter(**filters)
+        serializer = self.get_serializer(queryset, many=True)
 
         if not queryset.exists():
             return Response(
@@ -56,11 +57,15 @@ class ChatBotView(generics.GenericAPIView):
             success=True,
             status_code=status.HTTP_200_OK,
             message=response_data.get("message"),
-            data="".join(html_content)
+            data={
+                "html": "".join(html_content),
+                "investment_products": serializer.data
+            }
         )
 
 class ChatbotPromptView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
+
 
     def get(self, request, *args, **kwargs):
         user = request.user
@@ -89,11 +94,11 @@ class ChatbotPromptView(generics.GenericAPIView):
 
 class ChatbotRespondView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = InvestmentProductSerializer
 
     def post(self, request, *args, **kwargs):
         message = request.data.get("message", "").lower().strip()
 
-        # Get risk level and response from the flat maps
         risk_level = PROMPT_TO_RISK_MAP.get(message)
         response_text = PROMPT_RESPONSE_MESSAGES.get(message)
 
@@ -106,6 +111,11 @@ class ChatbotRespondView(generics.GenericAPIView):
             )
 
         investments = InvestmentProduct.objects.filter(risk_level=risk_level).order_by('-created_at')[:2]
+        serializer = self.get_serializer(investments, many=True)
+        text_blocks = [
+            f"{response_text} ",
+            f"Here are some {risk_level.lower()}-risk investments you might consider: "
+        ]
         html_blocks = [
             f"<h2>{escape(response_text)}</h2>",
             f"<h3>Here are some <strong>{risk_level.lower()}-risk</strong> investments you might consider:</h3>",
@@ -129,5 +139,9 @@ class ChatbotRespondView(generics.GenericAPIView):
             success=True,
             status_code=status.HTTP_200_OK,
             message="Chatbot response generated.",
-            data="".join(html_blocks)
+            data={
+                "html": "".join(html_blocks),
+                "text": "".join(text_blocks),
+                "investment_products": serializer.data
+            }
         )
