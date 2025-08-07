@@ -2,6 +2,7 @@ from django.db.models import Sum
 from rest_framework import generics, status, permissions
 from ..models.financial_profile import FinancialProfile
 from ..models.investment_portfolio import InvestmentPortfolio
+from ..models.investment_product import InvestmentProduct
 from ..models.transaction import Transaction
 from ..models.wallet import Wallet
 from ..serializers.financial_profile_serializer import FinancialProfileSerializer
@@ -77,6 +78,18 @@ class DashboardView(generics.GenericAPIView):
         else:
             profile_data = None
 
+        products = InvestmentProduct.objects.filter(risk_level=profile.risk_appetite).order_by('min_investment')[:3]
+        suggestions = []
+
+        for product in products:
+            suggestions.append({
+                "name": product.name,
+                "description": product.description,
+                "min_investment": product.min_investment,
+                "offer_price": product.offer_price,
+                "yield": product.indicative_yield
+            })
+
         return Response(
             success=True,
             status_code=status.HTTP_200_OK,
@@ -103,6 +116,7 @@ class DashboardView(generics.GenericAPIView):
                     "total_withdrawal": float(total_withdrawal),
                     "net_flow": float(total_deposit - total_withdrawal)
                 },
-                "financial_profile": profile_data
+                "financial_profile": profile_data,
+                "smart_suggestions": suggestions
             }
         )
