@@ -1,3 +1,4 @@
+from django.db.models import Sum
 from rest_framework import generics, status, permissions
 from ..models.financial_profile import FinancialProfile
 from ..models.investment_portfolio import InvestmentPortfolio
@@ -29,7 +30,6 @@ class DashboardView(generics.GenericAPIView):
 
         total_current_value = 0
         total_invested = 0
-
         portfolio_data = []
 
         for p in portfolio:
@@ -63,9 +63,10 @@ class DashboardView(generics.GenericAPIView):
         net_profit = total_current_value - total_invested
         percent_return = net_profit / total_invested * 100
 
-
         # Transactions
-        transactions = Transaction.objects.filter(user=user).order_by('created_at')[:5]
+        total_deposit = Transaction.objects.filter(user=user, transaction_type='DEPOSIT', status='SUCCESS').aggregate(total=Sum('amount'))['total'] or 0
+        total_withdrawal = Transaction.objects.filter(user=user, transaction_type='WITHDRAWAL', status='SUCCESS').aggregate(total=Sum('amount'))['total'] or 0
+        transactions = Transaction.objects.filter(user=user).order_by('created_at')
         total_transactions = Transaction.objects.filter(user=user).count()
         transaction_data = TransactionSerializer(transactions, many=True).data
 
@@ -92,11 +93,15 @@ class DashboardView(generics.GenericAPIView):
                     "portfolio_value": total_current_value,
                     "net_profit_loss": net_profit,
                     "profit_loss_percent": percent_return,
+                    "goal_progress": round((total_invested / total_current_value) * 100),
                     "investment_list": portfolio_data
                 },
                 "transactions": {
-                    "top5_transactions": transaction_data,
-                    "total_transactions": total_transactions
+                    "transactions_list": transaction_data,
+                    "total_transactions": total_transactions,
+                    "total_deposit": float(total_deposit),
+                    "total_withdrawal": float(total_withdrawal),
+                    "net_flow": float(total_deposit - total_withdrawal)
                 },
                 "financial_profile": profile_data
             }
