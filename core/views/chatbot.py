@@ -110,7 +110,7 @@ class ChatbotRespondView(generics.GenericAPIView):
                 data="<p>The message provided does not match any of the known prompts.</p>"
             )
 
-        investments = InvestmentProduct.objects.filter(risk_level=risk_level).order_by('-created_at')[:2]
+        investments = InvestmentProduct.objects.filter(risk_level=risk_level).order_by('-created_at')
         serializer = self.get_serializer(investments, many=True)
         text_blocks = [
             f"{response_text} ",
