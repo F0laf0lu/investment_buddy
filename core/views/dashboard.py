@@ -24,11 +24,45 @@ class DashboardView(generics.GenericAPIView):
             wallet_data = None
 
         # Portfolio
-        portfolio = InvestmentPortfolio.objects.filter(user=user)
-        if portfolio:
-            portfolio_data = InvestmentPortfolioSerializer(portfolio, many=True).data
-        else:
-            portfolio_data = None
+        portfolio = InvestmentPortfolio.objects.filter(user=user).select_related('product')
+        active_investment = portfolio.count()
+
+        total_current_value = 0
+        total_invested = 0
+
+        portfolio_data = []
+
+        for p in portfolio:
+            bid = p.product.bid_price
+            offer = p.product.offer_price
+            units = p.units_purchased
+            invested = p.amount_invested
+            ytd = p.product.year_to_date_yield_change or 0
+            current_value = units * offer
+
+            gain_loss = (offer - bid) * units
+            gain_loss_percent = (gain_loss / invested) * 100
+            ytd_return  = (ytd / 100) * invested
+
+            total_current_value += current_value
+            total_invested += invested
+
+            portfolio_data.append({
+                "id": p.id,
+                "product_name": p.product.name,
+                "asset_type": p.product.asset_type,
+                "risk_level":p.product.risk_level,
+                "amount_invested": invested,
+                "units": units,
+                "gain_loss_amount": round(gain_loss, 2),
+                "gain_loss_percent": round(gain_loss_percent, 2),
+                "ytd_percent": ytd,
+                "ytd_return_amount": round(ytd_return, 2),
+            })
+
+        net_profit = total_current_value - total_invested
+        percent_return = net_profit / total_invested * 100
+
 
         # Transactions
         transactions = Transaction.objects.filter(user=user).order_by('created_at')[:5]
@@ -53,7 +87,13 @@ class DashboardView(generics.GenericAPIView):
                     "full_name": user.full_name
                 },
                 "wallet": wallet_data,
-                "portfolio": portfolio_data,
+                "portfolio": {
+                    "active_investments": active_investment,
+                    "portfolio_value": total_current_value,
+                    "net_profit_loss": net_profit,
+                    "profit_loss_percent": percent_return,
+                    "investment_list": portfolio_data
+                },
                 "transactions": {
                     "top5_transactions": transaction_data,
                     "total_transactions": total_transactions
